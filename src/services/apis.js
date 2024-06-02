@@ -1,4 +1,4 @@
-const BASE_URL = 'https://edtects-server.onrender/api/v1'
+const BASE_URL = `https://edtects-server.onrender/api/v1`
 // AUTH ENDPOINTS
 export const endpoints = {
   SENDOTP_API: BASE_URL + "/auth/sendotp",
