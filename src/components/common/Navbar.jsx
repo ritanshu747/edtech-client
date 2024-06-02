@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { AiOutlineMenu, AiOutlineShoppingCart } from "react-icons/ai"
 import { BsChevronDown } from "react-icons/bs"
 import { useSelector } from "react-redux"
@@ -9,7 +9,7 @@ import { NavbarLinks } from "../../data/navbar-links"
 import { apiConnector } from "../../services/apiconnector"
 import { categories } from "../../services/apis"
 import { ACCOUNT_TYPE } from "../../utils/constants"
-import ProfileDropdown from "../core/Auth/ProfileDropDown"
+import ProfileDropdown from "../core/Auth/ProfileDropDown";
 
 function Navbar() {
   const { token } = useSelector((state) => state.auth)
@@ -19,6 +19,7 @@ function Navbar() {
 
   const [subLinks, setSubLinks] = useState([])
   const [loading, setLoading] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false) // State to track menu visibility
 
   useEffect(() => {
     ;(async () => {
@@ -33,10 +34,13 @@ function Navbar() {
     })()
   }, [])
 
-  // console.log("sub links", subLinks)
-
   const matchRoute = (route) => {
     return matchPath({ path: route }, location.pathname)
+  }
+
+  // Function to toggle menu visibility
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
   }
 
   return (
@@ -46,11 +50,72 @@ function Navbar() {
       } transition-all duration-200`}
     >
       <div className="flex w-11/12 max-w-maxContent items-center justify-between">
-        {/* Logo */}
         <Link to="/">
           <img src={logo} alt="Logo" width={160} height={32} loading="lazy" />
         </Link>
-        {/* Navigation links */}
+        {/* Menu button for mobile */}
+        <button className="mr-4 md:hidden" onClick={toggleMenu}>
+          <AiOutlineMenu fontSize={24} fill="#AFB2BF" />
+        </button>
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <nav className="md:hidden">
+            <ul className="flex flex-col gap-y-4 text-richblack-25">
+              {NavbarLinks.map((link, index) => (
+                <li key={index}>
+                  {link.title === "Catalog" ? (
+                    <>
+                      <div className="group relative flex cursor-pointer items-center gap-1">
+                        <p>{link.title}</p>
+                        <BsChevronDown />
+                        <div className="invisible absolute left-[50%] top-[50%] z-[1000] flex w-[200px] translate-x-[-50%] translate-y-[3em] flex-col rounded-lg bg-richblack-5 p-4 text-richblack-900 opacity-0 transition-all duration-150 lg:w-[300px]">
+                          <div className="absolute left-[50%] top-0 -z-10 h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
+                          {loading ? (
+                            <p className="text-center">Loading...</p>
+                          ) : subLinks.length ? (
+                            <>
+                              {subLinks
+                                ?.filter(
+                                  (subLink) => subLink?.courses?.length > 0
+                                )
+                                ?.map((subLink, i) => (
+                                  <Link
+                                    to={`/catalog/${subLink.name
+                                      .split(" ")
+                                      .join("-")
+                                      .toLowerCase()}`}
+                                    className="rounded-lg bg-transparent py-4 pl-4 hover:bg-richblack-50"
+                                    key={i}
+                                  >
+                                    <p>{subLink.name}</p>
+                                  </Link>
+                                ))}
+                            </>
+                          ) : (
+                            <p className="text-center">No Courses Found</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <Link to={link?.path}>
+                      <p
+                        className={`${
+                          matchRoute(link?.path)
+                            ? "text-yellow-25"
+                            : "text-richblack-25"
+                        }`}
+                      >
+                        {link.title}
+                      </p>
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+        {/* Desktop navigation */}
         <nav className="hidden md:block">
           <ul className="flex gap-x-6 text-richblack-25">
             {NavbarLinks.map((link, index) => (
@@ -88,10 +153,10 @@ function Navbar() {
                                   <p>{subLink.name}</p>
                                 </Link>
                               ))}
-                          </>
-                        ) : (
-                          <p className="text-center">No Courses Found</p>
-                        )}
+                            </>
+                          ) : (
+                            <p className="text-center">No Courses Found</p>
+                          )}
                       </div>
                     </div>
                   </>
@@ -140,9 +205,6 @@ function Navbar() {
           )}
           {token !== null && <ProfileDropdown />}
         </div>
-        <button className="mr-4 md:hidden">
-          <AiOutlineMenu fontSize={24} fill="#AFB2BF" />
-        </button>
       </div>
     </div>
   )
