@@ -1,5 +1,8 @@
 const BASE_URL = 'https://edtects-server.onrender.com/api/v1'
 // AUTH ENDPOINTS
+
+
+// AUTH ENDPOINTS
 export const endpoints = {
   SENDOTP_API: BASE_URL + "/auth/sendotp",
   SIGNUP_API: BASE_URL + "/auth/signup",
@@ -68,4 +71,5 @@ export const settingsEndpoints = {
   UPDATE_PROFILE_API: BASE_URL + "/profile/updateProfile",
   CHANGE_PASSWORD_API: BASE_URL + "/auth/changepassword",
   DELETE_PROFILE_API: BASE_URL + "/profile/deleteProfile",
+}
 }
